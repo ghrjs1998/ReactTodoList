@@ -4,6 +4,7 @@ import TodoCreate from "./components/TodoCreate";
 import TodoHead from "./components/TodoHead";
 import TodoList from "./components/TodoList";
 import TodoTemplate from "./components/TodoTemplate";
+import { TodoProvider } from "./TodoContext";
 
 // 페이지에 회색 배경색상 적용
 const GlobalStyle = createGlobalStyle`
@@ -15,12 +16,14 @@ const GlobalStyle = createGlobalStyle`
 function App() {
   return (
     <>
-      <GlobalStyle />
-      <TodoTemplate>
-        <TodoHead />
-        <TodoList />
-        <TodoCreate />
-      </TodoTemplate>
+      <TodoProvider>
+        <GlobalStyle />
+        <TodoTemplate>
+          <TodoHead />
+          <TodoList />
+          <TodoCreate />
+        </TodoTemplate>
+      </TodoProvider>
     </>
   );
 }

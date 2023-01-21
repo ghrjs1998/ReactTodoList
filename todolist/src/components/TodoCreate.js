@@ -1,9 +1,11 @@
 // 새로운 할 일을 등록할수 있게 해주는 컴포넌트
 // Todo Template의 하단부에 초록색 원 버튼을 렌더링해주고 이를 클릭하면 할 일을 입력할 수 있는 폼이 나타나고, 버튼을 다시 누르면 폼이 사라진다.
+// 이 컴포넌트에선 자체적으로 관리해야할 input상태도 있다
 
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { MdAdd } from "react-icons/md";
+import { useTodoDispatch, useTodoNextId } from "../TodoContext";
 
 const CircleButton = styled.button`
   background: #38d9a9;
@@ -80,14 +82,41 @@ const Input = styled.input`
 
 function TodoCreate() {
   const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+
+  const dispatch = useTodoDispatch();
+  const nextId = useTodoNextId();
 
   const onToggle = () => setOpen(!open);
+  const onChange = (e) => setValue(e.target.value);
+  // 새로운 항목을 추가하는 액션을 dispatch한 후 , value 초기화 및 open값을 false로 전환
+  const onSubmit = (e) => {
+    // 새로고침 방지
+    e.preventDefault();
+    dispatch({
+      type: "CREATE",
+      todo: {
+        id: nextId.current,
+        text: value,
+        done: false,
+      },
+    });
+    setValue("");
+    setOpen(false);
+    nextId.current += 1;
+  };
+
   return (
     <>
       {open && (
         <InsertFormPositioner>
-          <InsertForm>
-            <Input autoFocus placeholder="할 일을 입력 후, Enter 를 누르세요" />
+          <InsertForm onSubmit={onSubmit}>
+            <Input
+              autoFocus
+              placeholder="할 일을 입력 후, Enter 를 누르세요"
+              onChange={onChange}
+              value={value}
+            />
           </InsertForm>
         </InsertFormPositioner>
       )}
@@ -98,4 +127,5 @@ function TodoCreate() {
   );
 }
 
-export default TodoCreate;
+// TodoContext에서 관리하고 있는 state가 바뀔 때 TodoCreate의 불필요한 리렌더링을 방지 할 수 o.
+export default React.memo(TodoCreate);
